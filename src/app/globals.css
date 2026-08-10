@@ -1,26 +1,154 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+/* ---------------------------------------------------------------------------
+   Three landings, three palettes. Each one gets its own colour names rather
+   than a shared semantic layer — that way a landing's classes read literally
+   and no style can leak between them.
+   --------------------------------------------------------------------------- */
+@theme {
+  /* ---- Landing 1 · warm editorial ---- */
+  --color-cream: #faf6f0;
+  --color-shell: #f2e9df;
+  --color-clay: #b4552d;
+  --color-clay-soft: #e8cdbe;
+  --color-sage: #6b7f62;
+  --color-sage-soft: #dfe6da;
+  --color-bark: #2f2822;
+  --color-bark-muted: #6f635a;
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+  /* ---- Landing 2 · bold nocturne ---- */
+  --color-void: #08080c;
+  --color-void-soft: #12121a;
+  --color-neon: #c6ff4f;
+  --color-plasma: #7b5cff;
+  --color-mist: #a5a5b8;
+  --color-chalk: #f4f4f8;
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+  /* ---- Landing 3 · swiss minimal ---- */
+  --color-paper: #ffffff;
+  --color-paper-warm: #f4f4f2;
+  --color-graphite: #111111;
+  --color-graphite-soft: #5b5b5b;
+  --color-rule: #d8d8d4;
+  --color-signal: #1a4cff;
+
+  /* Fonts, one family per landing plus a shared UI face for the switcher. */
+  --font-editorial: var(--font-instrument), ui-serif, Georgia, serif;
+  --font-editorial-body: var(--font-karla), ui-sans-serif, system-ui, sans-serif;
+  --font-bold-display: var(--font-grotesk), ui-sans-serif, system-ui, sans-serif;
+  --font-swiss: var(--font-archivo), ui-sans-serif, system-ui, sans-serif;
+
+  --animate-drift-slow: drift 22s ease-in-out infinite alternate;
+  --animate-marquee: marquee 30s linear infinite;
+  --animate-pulse-ring: pulse-ring 3s ease-out infinite;
+
+  @keyframes drift {
+    from {
+      transform: translate3d(0, 0, 0) scale(1);
+    }
+    to {
+      transform: translate3d(1.5rem, -2rem, 0) scale(1.12);
+    }
+  }
+  @keyframes marquee {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(-50%);
+    }
+  }
+  @keyframes pulse-ring {
+    0% {
+      transform: scale(0.85);
+      opacity: 0.7;
+    }
+    70%,
+    100% {
+      transform: scale(1.6);
+      opacity: 0;
+    }
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 5rem;
+  }
+
+  body {
+    -webkit-font-smoothing: antialiased;
+    /* Each landing paints its own background on its root wrapper. */
+    background-color: var(--color-paper);
+  }
+
+  h1,
+  h2,
+  h3 {
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  :focus-visible {
+    outline: 2px solid currentColor;
+    outline-offset: 3px;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Utilities
+   --------------------------------------------------------------------------- */
+
+/** Landing 1 headline face. */
+@utility font-editorial {
+  font-family: var(--font-editorial);
+  font-weight: 400;
+  letter-spacing: -0.015em;
+  line-height: 1.05;
+}
+
+/** Landing 2 headline face — tight, heavy, slightly condensed feel. */
+@utility font-nocturne {
+  font-family: var(--font-bold-display);
+  font-weight: 700;
+  letter-spacing: -0.035em;
+  line-height: 0.95;
+}
+
+/** Landing 3 everything face — grotesque, tight tracking, uppercase labels. */
+@utility font-grid {
+  font-family: var(--font-swiss);
+  letter-spacing: -0.02em;
+  line-height: 1.02;
+}
+
+/** The small caps label used across landing 3 and in section eyebrows. */
+@utility micro-label {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+@utility marquee-track {
+  animation: var(--animate-marquee);
+  will-change: transform;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
 }
