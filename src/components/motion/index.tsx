@@ -177,26 +177,39 @@ export function LineReveal({
 }) {
   const reduced = useReducedMotion();
 
+  // The trigger lives on the wrapper, never on the moving line. Each line starts
+  // translated fully out of its own overflow-hidden box, and IntersectionObserver
+  // clips against that ancestor — so a line watching itself reports 0% visible,
+  // never animates, and stays hidden for good. The wrapper is not transformed,
+  // so it is always observable.
   return (
-    <span className={className}>
+    <motion.span
+      className={className}
+      initial="hidden"
+      whileInView="shown"
+      viewport={{ once: true, amount: 0.2 }}
+    >
       {lines.map((line, index) => (
         <span key={line} className="block overflow-hidden">
           <motion.span
             className={cn("block", lineClassName)}
-            initial={{ y: reduced ? 0 : "110%" }}
-            whileInView={{ y: "0%" }}
-            viewport={{ once: true, amount: 0.6 }}
-            transition={{
-              duration: reduced ? 0.2 : 0.75,
-              delay: reduced ? 0 : delay + index * 0.09,
-              ease: [0.16, 1, 0.3, 1],
+            variants={{
+              hidden: { y: reduced ? 0 : "110%" },
+              shown: {
+                y: "0%",
+                transition: {
+                  duration: reduced ? 0.2 : 0.75,
+                  delay: reduced ? 0 : delay + index * 0.09,
+                  ease: [0.16, 1, 0.3, 1],
+                },
+              },
             }}
           >
             {line}
           </motion.span>
         </span>
       ))}
-    </span>
+    </motion.span>
   );
 }
 
