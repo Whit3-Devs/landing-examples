@@ -21,7 +21,28 @@ const grotesk = Space_Grotesk({ variable: "--font-grotesk", subsets: ["latin"], 
 /** Landing 3 — grotesque used for everything. */
 const archivo = Archivo({ variable: "--font-archivo", subsets: ["latin"], display: "swap" });
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://landing-examples.example.com";
+/**
+ * Resolve the canonical origin.
+ *
+ * `??` is deliberately not used here: a platform env var that is *defined but
+ * empty* — an entry with no value in the Vercel dashboard — is `""`, which is
+ * not nullish, so `??` would hand it straight to `new URL()` and fail the
+ * build. A bare host is tolerated too, because that is what deploy platforms
+ * give you, and `.origin` drops any trailing slash or path so canonicals never
+ * end up doubled.
+ */
+function resolveSiteUrl(fallback: string) {
+  const raw = process.env.NEXT_PUBLIC_SITE_URL?.trim();
+  if (!raw) return fallback;
+  const candidate = /^https?:\/\//i.test(raw) ? raw : `https://${raw}`;
+  try {
+    return new URL(candidate).origin;
+  } catch {
+    return fallback;
+  }
+}
+
+const siteUrl = resolveSiteUrl("https://landing-examples.example.com");
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
